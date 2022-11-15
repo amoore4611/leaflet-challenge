@@ -1,58 +1,61 @@
-function createMap(bikeStations) {
-
-  // Create the tile layer that will be the background of our map.
-  var streetmap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+// Create the tile layer that will be the background of our map.
+  var defaultMap = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   });
 
-
-  // Create a baseMaps object to hold the streetmap layer.
-  var baseMaps = {
-    "Street Map": streetmap
-  };
-
-  // Create an overlayMaps object to hold the bikeStations layer.
-  var overlayMaps = {
-    "Bike Stations": bikeStations
-  };
-
-  // Create the map object with options.
-  var map = L.map("map-id", {
-    center: [40.73, -74.0059],
-    zoom: 12,
-    layers: [streetmap, bikeStations]
+  //greyscale layer
+  var greyscale = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+    maxZoom: 20,
+    attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
   });
 
-  // Create a layer control, and pass it baseMaps and overlayMaps. Add the layer control to the map.
-  L.control.layers(baseMaps, overlayMaps, {
-    collapsed: false
-  }).addTo(map);
-}
+  //water color layer
+  var waterColor = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.{ext}', {
+    attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: 'abcd',
+    minZoom: 1,
+    maxZoom: 16,
+    ext: 'jpg'
+  });
 
-function createMarkers(response) {
+  let topMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    maxZoom: 17,
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+  });
 
-  // Pull the "stations" property from response.data.
-  var stations = response.data.stations;
+  //create basemap
+  let baseMap = {
+    GreyScale: greyscale,
+    "Water Color": waterColor,
+    "Topography": topMap,
+    Default: defaultMap
+  };
 
-  // Initialize an array to hold bike markers.
-  var bikeMarkers = [];
+  // Create a map object
+  var myMap = L.map("map", {
+    center: [36.7783, -119.4179],
+    zoom: 3,
+    layers: [greyscale, waterColor, topMap, defaultMap]
+  });
 
-  // Loop through the stations array.
-  for (var index = 0; index < stations.length; index++) {
-    var station = stations[index];
+  // add the default map to the map
+  defaultMap.addTo(myMap);
 
-    // For each station, create a marker, and bind a popup with the station's name.
-    var bikeMarker = L.marker([station.lat, station.lon])
-      .bindPopup("<h3>" + station.name + "<h3><h3>Capacity: " + station.capacity + "</h3>");
+  //add the layer control 
+  L.control 
+    .layers(baseMap)
+    .addTo(myMap);
 
-    // Add the marker to the bikeMarkers array.
-    bikeMarkers.push(bikeMarker);
-  }
+  //create the info for the overlay of the earthquakes
+  let earthquakes = new L.layerGroup();
 
-  // Create a layer group that's made from the bike markers array, and pass it to the createMap function.
-  createMap(L.layerGroup(bikeMarkers));
-}
-
-
-// Perform an API call to the Citi Bike API to get the station information. Call createMarkers when it completes.
-d3.json("https://gbfs.citibikenyc.com/gbfs/en/station_information.json").then(createMarkers);
+  //get the data for the earthquakes and populate the layergroup
+  //call teh USGS GeoJson API
+  d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")
+  .then(
+    function(earthquakeData){
+    //console.log(earthquakeData); 
+    //plot circles where radius is dependent on the magnitude and color is dependent on the depth  
+    }
+  );
