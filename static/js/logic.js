@@ -76,7 +76,7 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
           return mag*5; //make sure that the circle is pronounced
     }
 
-    //add on to teh style for each data point
+    //add on to the style for each data point
     function dataStyle(feature)
     {
       return {
@@ -99,9 +99,9 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
       //set the style for each marker
       style: dataStyle, //calls the data style function and passes in the earthquake data
       //add popups
-      onEachFeature: function(feature, layer) {
-          layer.bindPopup('Magnitude: <b>${feature.properties.mag}</b><br> Depth: <b>${feature.geometry.coordinates[2]}</b><br>Location:<b>${feature.properties.place}</b>');
-      }
+      onEachFeature: function(feature, layer){
+          layer.bindPopup('Magnitude: <b>${feature.properties.mag}</b></br>Depth: <b>${feature.geometry.coordinates[2]}</b>Location: <b>${feature.properties.place}</b>');
+        }
     }).addTo(earthquakes);
   }
 );
